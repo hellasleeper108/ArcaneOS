@@ -10,8 +10,11 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
+# Only ignore Python venv lib directories, not React src/lib
+/lib/
+/lib64/
+venv/lib/
+venv/lib64/
 parts/
 sdist/
 var/
