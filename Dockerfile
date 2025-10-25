@@ -20,8 +20,12 @@ COPY app/ ./app/
 COPY core/ ./core/
 COPY ArcaneOS/ ./ArcaneOS/
 
-# Create directories for state files
-RUN mkdir -p /app/data
+# Copy startup script
+COPY start.sh ./start.sh
+RUN chmod +x ./start.sh
+
+# Create directories for state files and audio cache
+RUN mkdir -p /app/data /app/arcane_audio
 
 # Expose port
 EXPOSE 8000
@@ -31,9 +35,9 @@ ENV PYTHONUNBUFFERED=1
 ENV HOST=0.0.0.0
 ENV PORT=8000
 
-# Health check
+# Health check (using httpx which is already in requirements)
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD python -c "import requests; requests.get('http://localhost:8000/daemons')"
+    CMD python -c "import httpx; httpx.get('http://localhost:8000/health', timeout=5)"
 
-# Run the application
-CMD ["python", "-m", "app.main"]
+# Run the application using startup script (handles Railway PORT)
+CMD ["./start.sh"]
