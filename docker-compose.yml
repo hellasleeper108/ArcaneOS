@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  # FastAPI Backend
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: arcaneos-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG_MODE=false
+      - HOST=0.0.0.0
+      - PORT=8000
+      - RAINDROP_ENABLED=true
+      - MAX_CONCURRENT_DAEMONS=3
+    volumes:
+      # Persist state files
+      - ./data:/app/data
+      # Mount grimoire and veil state
+      - ./grimoire_spells.jsonl:/app/grimoire_spells.jsonl
+      - ./.veil_state.json:/app/.veil_state.json
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/daemons')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - arcaneos-network
+
+  # React Frontend
+  frontend:
+    build:
+      context: ./ArcaneOS/ui
+      dockerfile: Dockerfile
+    container_name: arcaneos-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    environment:
+      - REACT_APP_API_URL=http://backend:8000
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+    networks:
+      - arcaneos-network
+
+networks:
+  arcaneos-network:
+    driver: bridge
+
+volumes:
+  data:
+    driver: local

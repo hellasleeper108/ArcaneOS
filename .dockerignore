@@ -1,0 +1,63 @@
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+env/
+.venv
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+tests/
+test_*.py
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Documentation
+docs/
+examples/
+*.md
+!README.md
+
+# Node.js (not needed in backend image)
+node_modules/
+ArcaneOS/ui/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Logs and state files
+*.log
+logs/
+arcane_log.txt
+grimoire_spells.jsonl
+.veil_state.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Archon runtime (not needed in backend)
+archon-runtime/
