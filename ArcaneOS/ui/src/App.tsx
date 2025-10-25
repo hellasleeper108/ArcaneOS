@@ -26,12 +26,16 @@ const App: React.FC = () => {
     }
     setActivated(true);
 
-    try {
-      const cue = new Audio(INIT_COMPLETE_CUE);
-      cue.volume = 0.55;
-      void cue.play().catch(() => {});
-    } catch {
-      /* ignore cue errors */
+    // Only play audio if enabled
+    const audioEnabled = process.env.REACT_APP_ENABLE_AUDIO === 'true';
+    if (audioEnabled) {
+      try {
+        const cue = new Audio(INIT_COMPLETE_CUE);
+        cue.volume = 0.55;
+        void cue.play().catch(() => {});
+      } catch {
+        /* ignore cue errors */
+      }
     }
 
     setTimeout(() => setBootVisible(false), 1000);
@@ -64,6 +68,13 @@ const App: React.FC = () => {
   }, [veil]);
 
   useEffect(() => {
+    // Disable background audio in production (audio files not in repo)
+    const audioEnabled = process.env.REACT_APP_ENABLE_AUDIO === 'true';
+    if (!audioEnabled) {
+      console.log('Background audio disabled (REACT_APP_ENABLE_AUDIO not set)');
+      return;
+    }
+
     let interactionHandler: (() => void) | undefined;
     const start = () => {
       startBackgroundScore().catch(() => undefined);
