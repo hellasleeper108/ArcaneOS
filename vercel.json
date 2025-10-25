@@ -1,0 +1,27 @@
+{
+  "version": 2,
+  "name": "arcaneos-frontend",
+  "builds": [
+    {
+      "src": "ArcaneOS/ui/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "build"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/static/(.*)",
+      "dest": "/ArcaneOS/ui/build/static/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/ArcaneOS/ui/build/index.html"
+    }
+  ],
+  "outputDirectory": "ArcaneOS/ui/build",
+  "buildCommand": "cd ArcaneOS/ui && npm install && npm run build",
+  "installCommand": "cd ArcaneOS/ui && npm install",
+  "framework": null
+}
