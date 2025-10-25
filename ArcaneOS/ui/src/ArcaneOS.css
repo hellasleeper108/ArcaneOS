@@ -1,0 +1,168 @@
+/* --- Base Container --- */
+.arcane-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background: #0a0a0f;
+  overflow: hidden;
+  color: white;
+  font-family: 'Georgia', serif;
+}
+
+/* --- Toggle Button --- */
+.mode-toggle {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  pointer-events: auto;
+}
+.mode-toggle:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: #00ffff;
+  text-shadow: 0 0 5px #00ffff;
+}
+
+/* --- Base Layer Styles --- */
+.fantasy-layer,
+.dev-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ======================================= */
+/* --- FANTASY MODE STYLES --- */
+/* ======================================= */
+
+.fantasy-content {
+  z-index: 10;
+  text-align: center;
+}
+
+.particle-field-1,
+.particle-field-2 {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.particle-field-2 {
+  transform: scale(1.5);
+  opacity: 0.6;
+}
+.particle {
+  position: absolute;
+  background: #00ffff;
+  border-radius: 50%;
+  width: 3px;
+  height: 3px;
+  filter: drop-shadow(0 0 3px #00ffff) drop-shadow(0 0 8px #00ffff);
+}
+.particle-field-2 .particle {
+  background: #ff00ff;
+  filter: drop-shadow(0 0 3px #ff00ff) drop-shadow(0 0 8px #ff00ff);
+}
+
+.glow-text {
+  font-size: 4rem;
+  font-weight: bold;
+  color: #ffffff;
+  text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #00ffff, 0 0 30px #00ffff;
+}
+.glow-text-secondary {
+  font-size: 1.2rem;
+  color: #ddd;
+  text-shadow: 0 0 5px #fff, 0 0 10px #00ffff;
+  margin-top: -10px;
+}
+
+.daemon-grid {
+  display: flex;
+  gap: 40px;
+  margin-top: 50px;
+}
+.daemon-avatar {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.daemon-icon {
+  font-size: 3rem;
+  color: #ff00ff;
+  z-index: 5;
+  text-shadow: 0 0 5px #ff00ff, 0 0 15px #ff00ff;
+}
+.daemon-name {
+  font-size: 0.8rem;
+  color: #aaa;
+  z-index: 5;
+}
+
+.aura {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 2px solid #ff00ff;
+  border-radius: 50%;
+  animation: pulse-aura 3s infinite ease-in-out;
+  z-index: 2;
+  box-shadow: 0 0 10px #ff00ff, inset 0 0 10px #ff00ff;
+}
+
+@keyframes pulse-aura {
+  0% { transform: scale(0.9); opacity: 0.5; }
+  50% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.5; }
+}
+
+/* ======================================= */
+/* --- DEVELOPER MODE STYLES --- */
+/* ======================================= */
+
+.dev-layer {
+  background: #0a0a0f;
+  justify-content: flex-end;
+  align-items: flex-start;
+  padding-bottom: 20px;
+}
+.terminal {
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.terminal pre {
+  font-family: 'Fira Code', 'Courier New', monospace;
+  font-size: 14px;
+  color: #00ff00;
+  text-shadow: 0 0 3px #00ff00;
+  white-space: pre-wrap;
+  margin: 0;
+}
+.terminal code .cursor {
+  animation: blink 1s infinite;
+  background: #00ff00;
+  color: #0a0a0f;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}

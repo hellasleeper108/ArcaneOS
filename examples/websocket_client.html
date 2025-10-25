@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArcaneOS Event Stream - WebSocket Client</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e0e0e0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 2px solid #8B5CF6;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #8B5CF6;
+            text-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #a0a0a0;
+            font-size: 1.1em;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            font-family: 'Courier New', monospace;
+            border: 2px solid;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        #connectBtn {
+            background: #8B5CF6;
+            color: white;
+            border-color: #8B5CF6;
+        }
+
+        #connectBtn:hover {
+            background: #7C3AED;
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+        }
+
+        #disconnectBtn {
+            background: #EF4444;
+            color: white;
+            border-color: #EF4444;
+        }
+
+        #disconnectBtn:hover {
+            background: #DC2626;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
+        }
+
+        #disconnectBtn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        #clearBtn {
+            background: #6B7280;
+            color: white;
+            border-color: #6B7280;
+        }
+
+        #clearBtn:hover {
+            background: #4B5563;
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status.connected {
+            background: rgba(34, 197, 94, 0.1);
+            border: 2px solid #22C55E;
+            color: #22C55E;
+        }
+
+        .status.disconnected {
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px solid #EF4444;
+            color: #EF4444;
+        }
+
+        .status.connecting {
+            background: rgba(251, 191, 36, 0.1);
+            border: 2px solid #FBBF24;
+            color: #FBBF24;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .events-container {
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid #4B5563;
+            border-radius: 8px;
+            padding: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .event {
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border-left: 4px solid;
+            background: rgba(255, 255, 255, 0.05);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .event.summon { border-color: #8B5CF6; }
+        .event.invoke { border-color: #F59E0B; }
+        .event.banish { border-color: #06B6D4; }
+        .event.reveal { border-color: #10B981; }
+        .event.parse { border-color: #EC4899; }
+
+        .event-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .event-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .event-time {
+            color: #9CA3AF;
+            font-size: 0.9em;
+        }
+
+        .event-daemon {
+            color: #A78BFA;
+            margin-bottom: 8px;
+        }
+
+        .event-description {
+            color: #D1D5DB;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .event-metadata {
+            font-size: 0.9em;
+            color: #9CA3AF;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .connection-event {
+            background: rgba(139, 92, 246, 0.1);
+            border: 2px solid #8B5CF6;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #8B5CF6;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #7C3AED;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔮 ArcaneOS Event Stream 🔮</h1>
+            <p class="subtitle">Real-time WebSocket Client for Mystical Events</p>
+        </header>
+
+        <div class="controls">
+            <button id="connectBtn" onclick="connect()">Connect to Event Stream</button>
+            <button id="disconnectBtn" onclick="disconnect()" disabled>Disconnect</button>
+            <button id="clearBtn" onclick="clearEvents()">Clear Events</button>
+        </div>
+
+        <div id="status" class="status disconnected">
+            <div class="status-indicator"></div>
+            <span id="statusText">Disconnected</span>
+        </div>
+
+        <div class="events-container" id="eventsContainer">
+            <p style="text-align: center; color: #9CA3AF;">
+                ✨ Connect to the event stream to see real-time mystical events... ✨
+            </p>
+        </div>
+    </div>
+
+    <script>
+        let ws = null;
+        const wsUrl = 'ws://localhost:8000/ws/events';
+
+        function updateStatus(status, text) {
+            const statusEl = document.getElementById('status');
+            const statusText = document.getElementById('statusText');
+            const connectBtn = document.getElementById('connectBtn');
+            const disconnectBtn = document.getElementById('disconnectBtn');
+
+            statusEl.className = `status ${status}`;
+            statusText.textContent = text;
+
+            if (status === 'connected') {
+                connectBtn.disabled = true;
+                disconnectBtn.disabled = false;
+            } else if (status === 'disconnected') {
+                connectBtn.disabled = false;
+                disconnectBtn.disabled = true;
+            }
+        }
+
+        function connect() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                console.log('Already connected');
+                return;
+            }
+
+            updateStatus('connecting', 'Connecting to ArcaneOS...');
+
+            try {
+                ws = new WebSocket(wsUrl);
+
+                ws.onopen = () => {
+                    console.log('WebSocket connected');
+                    updateStatus('connected', 'Connected to ArcaneOS Event Stream');
+                };
+
+                ws.onmessage = (event) => {
+                    try {
+                        const data = JSON.parse(event.data);
+                        displayEvent(data);
+                    } catch (error) {
+                        console.error('Error parsing message:', error);
+                    }
+                };
+
+                ws.onerror = (error) => {
+                    console.error('WebSocket error:', error);
+                    updateStatus('disconnected', 'Connection Error');
+                };
+
+                ws.onclose = () => {
+                    console.log('WebSocket disconnected');
+                    updateStatus('disconnected', 'Disconnected from Event Stream');
+                };
+
+            } catch (error) {
+                console.error('Failed to connect:', error);
+                updateStatus('disconnected', 'Connection Failed');
+            }
+        }
+
+        function disconnect() {
+            if (ws) {
+                ws.close();
+                ws = null;
+            }
+        }
+
+        function displayEvent(event) {
+            const container = document.getElementById('eventsContainer');
+
+            // Handle connection message
+            if (event.type === 'connection') {
+                container.innerHTML = `
+                    <div class="connection-event">
+                        <div>${event.message}</div>
+                        <div style="margin-top: 10px; font-size: 0.9em;">
+                            Active Subscribers: ${event.subscriber_count || 0}
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Create event element
+            const eventEl = document.createElement('div');
+            eventEl.className = `event ${event.spell_name || 'unknown'}`;
+
+            // Format timestamp
+            const timestamp = event.timestamp ? new Date(event.timestamp).toLocaleTimeString() : new Date().toLocaleTimeString();
+
+            // Build event HTML
+            let html = `
+                <div class="event-header">
+                    <div class="event-title">
+                        ${getSpellIcon(event.spell_name)} ${event.spell_name || 'Unknown'}
+                        ${event.success ? '✅' : '❌'}
+                    </div>
+                    <div class="event-time">${timestamp}</div>
+                </div>
+            `;
+
+            if (event.daemon_name) {
+                html += `<div class="event-daemon">🎭 Daemon: ${event.daemon_name}</div>`;
+            }
+
+            if (event.description) {
+                html += `<div class="event-description">${event.description}</div>`;
+            }
+
+            // Add metadata
+            if (event.metadata && Object.keys(event.metadata).length > 0) {
+                html += '<div class="event-metadata">';
+
+                if (event.metadata.execution_time !== undefined) {
+                    html += `⏱️ Execution: ${event.metadata.execution_time.toFixed(3)}s<br>`;
+                }
+
+                if (event.metadata.task) {
+                    const taskPreview = event.metadata.task.length > 100
+                        ? event.metadata.task.substring(0, 100) + '...'
+                        : event.metadata.task;
+                    html += `📋 Task: ${taskPreview}<br>`;
+                }
+
+                if (event.metadata.invocation_count !== undefined) {
+                    html += `🔢 Invocations: ${event.metadata.invocation_count}<br>`;
+                }
+
+                if (event.metadata.total_invocations !== undefined) {
+                    html += `📊 Total Invocations: ${event.metadata.total_invocations}<br>`;
+                }
+
+                html += '</div>';
+            }
+
+            eventEl.innerHTML = html;
+
+            // Add to container (prepend for newest first)
+            container.insertBefore(eventEl, container.firstChild);
+
+            // Limit to 50 events
+            while (container.children.length > 50) {
+                container.removeChild(container.lastChild);
+            }
+        }
+
+        function getSpellIcon(spellName) {
+            const icons = {
+                'summon': '🔮',
+                'invoke': '⚡',
+                'banish': '🌙',
+                'reveal': '📜',
+                'parse': '📖'
+            };
+            return icons[spellName] || '✨';
+        }
+
+        function clearEvents() {
+            const container = document.getElementById('eventsContainer');
+            container.innerHTML = '<p style="text-align: center; color: #9CA3AF;">✨ Events cleared ✨</p>';
+        }
+
+        // Auto-connect on load (optional)
+        // window.onload = () => connect();
+    </script>
+</body>
+</html>

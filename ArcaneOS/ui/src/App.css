@@ -1,0 +1,69 @@
+.App {
+  text-align: center;
+}
+
+@keyframes arcane-pulse {
+  0% {
+    box-shadow: 0 0 0 rgba(168, 85, 247, 0.0);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 38px rgba(168, 85, 247, 0.55);
+    transform: scale(1.01);
+  }
+  100% {
+    box-shadow: 0 0 0 rgba(168, 85, 247, 0.0);
+    transform: scale(1);
+  }
+}
+
+@keyframes arcane-invert-flash {
+  0% {
+    filter: invert(0);
+  }
+  50% {
+    filter: invert(1) brightness(1.1);
+  }
+  100% {
+    filter: invert(0);
+  }
+}
+
+.arcane-pulse {
+  animation: arcane-pulse 0.2s ease-in-out;
+}
+
+.arcane-invert {
+  animation: arcane-invert-flash 0.2s ease-in-out;
+}
+
+.arcane-particles {
+  transition: opacity 0.2s ease-in-out;
+  opacity: 1;
+}
+
+.arcane-particles-idle {
+  opacity: 0.35 !important;
+}
+
+.arcane-particles-halt {
+  opacity: 0 !important;
+}
+
+.arcane-failure-text {
+  font-family: 'Cinzel', 'UnifrakturMaguntia', 'Times New Roman', serif;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+}
+
+.developer-mode {
+  filter: none !important;
+}
+
+.developer-mode .arcane-failure-text {
+  display: none;
+}
+
+.developer-mode pre {
+  font-family: 'Fira Code', 'Source Code Pro', monospace;
+}

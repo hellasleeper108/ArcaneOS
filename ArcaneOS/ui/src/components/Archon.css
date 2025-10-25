@@ -1,0 +1,224 @@
+/* --- Archon Container & Toast --- */
+.archon-container {
+  position: absolute;
+  bottom: 30px;
+  right: 30px;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+}
+
+.archon-toast {
+  pointer-events: auto;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid #ff00ff;
+  color: #ff00ff;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-family: 'Georgia', serif;
+  font-style: italic;
+  font-size: 14px;
+  margin-bottom: 20px;
+  text-shadow: 0 0 5px #ff00ff;
+  box-shadow: 0 0 10px #ff00ff;
+}
+
+/* --- Base Sigil Structure --- */
+.archon-sigil {
+  width: 80px;
+  height: 80px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.5s ease;
+}
+
+.archon-eye {
+  width: 50px;
+  height: 50px;
+  border: 2px solid #00ffff;
+  border-radius: 50% 10%;
+  transform: rotate(45deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 10px #00ffff, inset 0 0 10px #00ffff;
+  transition: all 0.5s ease;
+}
+
+.archon-iris {
+  width: 20px;
+  height: 20px;
+  background: #ff00ff;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff;
+  transition: all 0.3s ease;
+}
+
+.archon-runes {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.rune {
+  position: absolute;
+  color: #00ffff;
+  font-size: 16px;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.rune:nth-child(1) {
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.rune:nth-child(2) {
+  bottom: 10%;
+  left: 15%;
+}
+.rune:nth-child(3) {
+  bottom: 10%;
+  right: 15%;
+}
+
+/* =========================== */
+/* --- ARCHON STATES --- */
+/* =========================== */
+
+.archon-sigil.idle .archon-eye {
+  border-color: #008f8f;
+  animation: pulse-low 3s infinite ease-in-out;
+  box-shadow: 0 0 5px #00ffff, inset 0 0 5px #00ffff;
+}
+.archon-sigil.idle .archon-iris {
+  background: #8f008f;
+  box-shadow: 0 0 5px #ff00ff;
+  transform: scale(0.9);
+}
+
+@keyframes pulse-low {
+  0%, 100% {
+    transform: rotate(45deg) scale(1);
+  }
+  50% {
+    transform: rotate(45deg) scale(1.05);
+  }
+}
+
+.archon-sigil.processing .archon-iris {
+  animation: spin 1.5s linear infinite;
+  background: #ffffff;
+  box-shadow: 0 0 15px #ff00ff, 0 0 30px #ff00ff, 0 0 45px #ffffff;
+}
+.archon-sigil.processing .archon-runes {
+  animation: spin 6s linear infinite;
+}
+.archon-sigil.processing .rune {
+  opacity: 1;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.archon-sigil.success .archon-eye {
+  border-color: #ffffff;
+  box-shadow: 0 0 20px #ffffff, inset 0 0 20px #00ffff;
+  animation: flare 0.5s ease-out;
+}
+.archon-sigil.success .archon-iris {
+  background: #ffffff;
+  transform: scale(1.5);
+  box-shadow: 0 0 20px #fff, 0 0 40px #fff, 0 0 60px #00ffff;
+}
+
+@keyframes flare {
+  0% {
+    transform: rotate(45deg) scale(1);
+  }
+  50% {
+    transform: rotate(45deg) scale(1.2);
+  }
+  100% {
+    transform: rotate(45deg) scale(1);
+  }
+}
+
+.archon-sigil.failure {
+  animation: flicker 0.3s infinite;
+  opacity: 0.6;
+}
+.archon-sigil.failure .archon-eye {
+  border-color: #555;
+  box-shadow: none;
+}
+.archon-sigil.failure .archon-iris {
+  background: #333;
+  box-shadow: none;
+}
+
+@keyframes flicker {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.archon-sigil.wireframe .archon-eye {
+  background: transparent;
+  border-width: 1px;
+  border-color: #00ff00;
+  box-shadow: none;
+  animation: none;
+}
+
+.archon-sigil.wireframe .archon-iris {
+  background: transparent;
+  border: 1px solid #00ff00;
+  box-shadow: none;
+  transform: scale(1);
+}
+
+.archon-sigil.wireframe .rune {
+  color: #00ff00;
+  text-shadow: none;
+}
+
+.archon-sigil.wireframe.processing .archon-iris {
+  animation: spin 1.5s linear infinite;
+  background: #00ff00;
+  border-color: #00ff00;
+}
+
+.archon-sigil.wireframe.success .archon-eye {
+  border-color: #ffffff;
+  animation: flare 0.5s ease-out;
+}
+
+.archon-sigil.wireframe.success .archon-iris {
+  background: #ffffff;
+  border-color: #ffffff;
+  transform: scale(1.5);
+}
+
+.archon-sigil.wireframe.failure {
+  animation: flicker 0.3s infinite;
+  opacity: 0.6;
+}
+
+.archon-sigil.wireframe.failure .archon-eye,
+.archon-sigil.wireframe.failure .archon-iris {
+  border-color: #555;
+  background: transparent;
+}
